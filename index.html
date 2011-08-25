@@ -8,20 +8,37 @@
   <script src="scripts/jquery.js"></script>
   <script src="scripts/conway.js"></script>
   <style type="text/css" media="screen">
+    body {
+     font: 2px monospace; 
+    }
     div {
-      margin: 10px;
+      margin: 6px;
     }
     table {
       border-collapse: collapse;
     }
-    td, th {
+    tr {
       margin: 0;
       padding: 0;
+    }
+    td, th {
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      width: 5px;
+      height: 5px;
+    }
+    .active {
+      color: white;
+      background-color: black;
+    }
+    .dead {
+      color: black;
+      background-color: white;
     }
   </style>
 </head>
 <body>
-  <p>Conway</p>
   <div id="input"></div>
   <div id="counts"></div>
   <div id="output"></div>
