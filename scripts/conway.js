@@ -1,132 +1,141 @@
 (function() {
   var Game;
   Game = (function() {
+    var BLOCK, GLIDER, SURROUND;
+    SURROUND = [-1, 0, 1];
+    GLIDER = [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]];
+    BLOCK = [[0, 0], [0, 1], [1, 0], [1, 1]];
     function Game() {
-      this.x = 100;
-      this.y = 100;
-      this.board = new Array(this.x);
+      this.x = 50;
+      this.y = 60;
+      this.random_board();
     }
     Game.prototype.random_cell = function() {
-      return Math.floor(Math.random() * 2);
+      return Math.floor(Math.random() * 2) === 1;
+    };
+    Game.prototype.random_board = function() {
+      var cell, row, x, y, _len, _ref, _results;
+      this.board = new Array(this.x);
+      _ref = this.board;
+      _results = [];
+      for (x = 0, _len = _ref.length; x < _len; x++) {
+        row = _ref[x];
+        this.board[x] = new Array(this.y);
+        _results.push((function() {
+          var _len2, _ref2, _results2;
+          _ref2 = this.board[x];
+          _results2 = [];
+          for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
+            cell = _ref2[y];
+            _results2.push(this.board[x][y] = this.random_cell());
+          }
+          return _results2;
+        }).call(this));
+      }
+      return _results;
+    };
+    Game.prototype.predefined = function() {
+      var coords, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = GLIDER.length; _i < _len; _i++) {
+        coords = GLIDER[_i];
+        _results.push(this.board[coords[0] + 10][coords[1] + 10] = true);
+      }
+      return _results;
     };
     Game.prototype.init_board = function() {
-      var x, y, _ref, _ref2;
-      for (x = 0, _ref = this.x - 1; 0 <= _ref ? x <= _ref : x >= _ref; 0 <= _ref ? x++ : x--) {
+      var cell, row, x, y, _len, _len2, _ref, _ref2;
+      this.board = new Array(this.x);
+      _ref = this.board;
+      for (x = 0, _len = _ref.length; x < _len; x++) {
+        row = _ref[x];
         this.board[x] = new Array(this.y);
-        for (y = 0, _ref2 = this.y - 1; 0 <= _ref2 ? y <= _ref2 : y >= _ref2; 0 <= _ref2 ? y++ : y--) {
-          this.board[x][y] = this.random_cell();
+        _ref2 = this.board[x];
+        for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
+          cell = _ref2[y];
+          this.board[x][y] = false;
         }
       }
-      return console.log(this.board);
+      return this.random_board();
     };
     Game.prototype.neighbour_count = function(x, y) {
-      var cur_x, cur_y, i, j, result, _i, _j, _len, _len2, _ref, _ref2;
+      var cur_x, cur_y, i, j, result, _i, _j, _len, _len2;
       result = 0;
-      _ref = [-1, 0, 1];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        i = _ref[_i];
+      for (_i = 0, _len = SURROUND.length; _i < _len; _i++) {
+        i = SURROUND[_i];
         cur_x = x + i;
-        if (cur_x >= this.x) {
-          cur_x = 0;
-        }
-        if (cur_x <= 0) {
-          cur_x = this.x - 1;
-        }
-        _ref2 = [-1, 0, 1];
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          j = _ref2[_j];
-          cur_y = y + i;
-          if (cur_y >= this.y) {
-            cur_y = 0;
-          }
-          if (cur_y <= 0) {
-            cur_y = this.y - 1;
-          }
-          if (!(i === 0 && j === 0)) {
-            result += this.board[cur_x][cur_y];
+        for (_j = 0, _len2 = SURROUND.length; _j < _len2; _j++) {
+          j = SURROUND[_j];
+          cur_y = y + j;
+          if (!((i === 0 && j === 0) || (cur_y >= this.y) || (cur_y < 0) || (cur_x >= this.x) || (cur_x < 0))) {
+            if (this.board[cur_x][cur_y]) {
+              result += 1;
+            }
           }
         }
       }
       return result;
     };
-    Game.prototype.print_counts = function() {
-      var count, result, x, y, _ref, _ref2;
-      result = "";
-      for (x = 0, _ref = this.x - 1; 0 <= _ref ? x <= _ref : x >= _ref; 0 <= _ref ? x++ : x--) {
-        result += "<tr>";
-        for (y = 0, _ref2 = this.y - 1; 0 <= _ref2 ? y <= _ref2 : y >= _ref2; 0 <= _ref2 ? y++ : y--) {
-          count = this.neighbour_count(x, y);
-          result += "<td>" + count + "</td>";
+    Game.prototype.print_table = function() {
+      var cell, cells, row, rows, x, y, _len, _len2, _ref, _ref2;
+      rows = "";
+      _ref = this.board;
+      for (x = 0, _len = _ref.length; x < _len; x++) {
+        row = _ref[x];
+        cells = "";
+        _ref2 = this.board[x];
+        for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
+          cell = _ref2[y];
+          cells += "<td class='" + (this.show_cell(x, y)) + "'>&nbsp;</td>";
         }
-        result += "</tr>";
+        rows += "<tr>" + cells + "</tr>";
       }
-      return "<table>" + result + "</table>";
+      return "<table>" + rows + "</table>";
     };
-    Game.prototype.print_input = function() {
-      var result, x, y, _ref, _ref2;
-      result = "";
-      for (x = 0, _ref = this.x - 1; 0 <= _ref ? x <= _ref : x >= _ref; 0 <= _ref ? x++ : x--) {
-        result += "<tr>";
-        for (y = 0, _ref2 = this.y - 1; 0 <= _ref2 ? y <= _ref2 : y >= _ref2; 0 <= _ref2 ? y++ : y--) {
-          result += "<td>" + this.board[x][y] + "</td>";
-        }
-        result += "</tr>";
+    Game.prototype.live_message = function(x, y) {
+      if (this.should_live(x, y)) {
+        return "L";
       }
-      return "<table>" + result + "</table>";
+      return "&nbsp;";
     };
-    Game.prototype.print_output = function() {
-      var result, val, x, y, _ref, _ref2;
-      result = "";
-      for (x = 0, _ref = this.x - 1; 0 <= _ref ? x <= _ref : x >= _ref; 0 <= _ref ? x++ : x--) {
-        result += "<tr>";
-        for (y = 0, _ref2 = this.y - 1; 0 <= _ref2 ? y <= _ref2 : y >= _ref2; 0 <= _ref2 ? y++ : y--) {
-          val = " ";
-          if (this.live_or_die(x, y)) {
-            val = "&#9689;";
-          }
-          result += "<td>" + val + "</td>";
-        }
-        result += "</tr>";
-      }
-      return "<table>" + result + "</table>";
+    Game.prototype.toggle = function(x, y) {
+      var new_val;
+      return new_val = !this.board[x][y];
     };
-    Game.prototype.live_or_die = function(x, y) {
-      var count;
-      count = this.neighbour_count(x, y);
-      if (this.board[x][y] === 1) {
-        switch (false) {
-          case !(count < 2):
-            return false;
-          case !(count > 3):
-            return false;
-          default:
-            return true;
-        }
-      } else {
-        if (count === 3) {
-          return true;
-        }
+    Game.prototype.should_live = function(x, y) {
+      var alive, neighbours, overpopulated, reproducing, underpopulated;
+      neighbours = this.neighbour_count(x, y);
+      alive = this.board[x][y];
+      underpopulated = alive && neighbours < 2;
+      overpopulated = alive && neighbours > 3;
+      reproducing = !alive && neighbours === 3;
+      if (underpopulated || overpopulated || reproducing) {
+        return !this.board[x][y];
       }
-      return false;
+      return this.board[x][y];
     };
     Game.prototype.new_board = function() {
-      var new_board, val, x, y, _ref, _ref2;
-      new_board = new Array;
-      for (x = 0, _ref = this.x - 1; 0 <= _ref ? x <= _ref : x >= _ref; 0 <= _ref ? x++ : x--) {
+      var cell, new_board, row, x, y, _len, _len2, _ref;
+      new_board = new Array(this.x);
+      for (x = 0, _len = new_board.length; x < _len; x++) {
+        row = new_board[x];
         new_board[x] = new Array(this.y);
-        for (y = 0, _ref2 = this.y - 1; 0 <= _ref2 ? y <= _ref2 : y >= _ref2; 0 <= _ref2 ? y++ : y--) {
-          val = 0;
-          if (this.live_or_die(x, y)) {
-            val = 1;
-          }
-          new_board[x][y] = val;
+        _ref = new_board[x];
+        for (y = 0, _len2 = _ref.length; y < _len2; y++) {
+          cell = _ref[y];
+          new_board[x][y] = this.should_live(x, y);
         }
       }
-      this.board = new_board;
-      return console.log("new_board");
+      return this.board = new_board;
+    };
+    Game.prototype.show_cell = function(x, y) {
+      if (this.board[x][y]) {
+        return "active";
+      }
+      return "dead";
     };
     Game.prototype.show = function() {
-      $("#output").html(this.print_output());
+      $("#output").html(this.print_table());
       return this.new_board();
     };
     return Game;
@@ -135,6 +144,7 @@
     var game;
     game = new Game;
     game.init_board();
+    game.show();
     return setInterval((function() {
       return game.show();
     }), 100);
