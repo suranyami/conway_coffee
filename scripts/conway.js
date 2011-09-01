@@ -1,38 +1,35 @@
 (function() {
   var Game;
   Game = (function() {
-    var BLOCK, GLIDER, SURROUND;
+    var BLOCK, GLIDER, HEIGHT, SURROUND, WIDTH;
     SURROUND = [-1, 0, 1];
     GLIDER = [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]];
     BLOCK = [[0, 0], [0, 1], [1, 0], [1, 1]];
+    WIDTH = 50;
+    HEIGHT = 60;
     function Game() {
-      this.x = 50;
-      this.y = 60;
-      this.random_board();
+      this.init_board();
     }
     Game.prototype.random_cell = function() {
       return Math.floor(Math.random() * 2) === 1;
     };
     Game.prototype.random_board = function() {
-      var cell, row, x, y, _len, _ref, _results;
-      this.board = new Array(this.x);
-      _ref = this.board;
-      _results = [];
-      for (x = 0, _len = _ref.length; x < _len; x++) {
-        row = _ref[x];
-        this.board[x] = new Array(this.y);
-        _results.push((function() {
-          var _len2, _ref2, _results2;
-          _ref2 = this.board[x];
-          _results2 = [];
-          for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
-            cell = _ref2[y];
-            _results2.push(this.board[x][y] = this.random_cell());
-          }
-          return _results2;
-        }).call(this));
-      }
-      return _results;
+      var x, y;
+      return this.board = (function() {
+        var _results;
+        _results = [];
+        for (x = 0; 0 <= WIDTH ? x < WIDTH : x > WIDTH; 0 <= WIDTH ? x++ : x--) {
+          _results.push((function() {
+            var _results2;
+            _results2 = [];
+            for (y = 0; 0 <= HEIGHT ? y < HEIGHT : y > HEIGHT; 0 <= HEIGHT ? y++ : y--) {
+              _results2.push(this.random_cell());
+            }
+            return _results2;
+          }).call(this));
+        }
+        return _results;
+      }).call(this);
     };
     Game.prototype.predefined = function() {
       var coords, _i, _len, _results;
@@ -44,18 +41,22 @@
       return _results;
     };
     Game.prototype.init_board = function() {
-      var cell, row, x, y, _len, _len2, _ref, _ref2;
-      this.board = new Array(this.x);
-      _ref = this.board;
-      for (x = 0, _len = _ref.length; x < _len; x++) {
-        row = _ref[x];
-        this.board[x] = new Array(this.y);
-        _ref2 = this.board[x];
-        for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
-          cell = _ref2[y];
-          this.board[x][y] = false;
+      var x, y;
+      this.board = (function() {
+        var _results;
+        _results = [];
+        for (x = 0; 0 <= WIDTH ? x < WIDTH : x > WIDTH; 0 <= WIDTH ? x++ : x--) {
+          _results.push((function() {
+            var _results2;
+            _results2 = [];
+            for (y = 0; 0 <= HEIGHT ? y < HEIGHT : y > HEIGHT; 0 <= HEIGHT ? y++ : y--) {
+              _results2.push(false);
+            }
+            return _results2;
+          })());
         }
-      }
+        return _results;
+      })();
       return this.random_board();
     };
     Game.prototype.neighbour_count = function(x, y) {
@@ -67,7 +68,7 @@
         for (_j = 0, _len2 = SURROUND.length; _j < _len2; _j++) {
           j = SURROUND[_j];
           cur_y = y + j;
-          if (!((i === 0 && j === 0) || (cur_y >= this.y) || (cur_y < 0) || (cur_x >= this.x) || (cur_x < 0))) {
+          if (!((i === 0 && j === 0) || (cur_y >= HEIGHT) || (cur_y < 0) || (cur_x >= WIDTH) || (cur_x < 0))) {
             if (this.board[cur_x][cur_y]) {
               result += 1;
             }
@@ -77,19 +78,26 @@
       return result;
     };
     Game.prototype.print_table = function() {
-      var cell, cells, row, rows, x, y, _len, _len2, _ref, _ref2;
-      rows = "";
-      _ref = this.board;
-      for (x = 0, _len = _ref.length; x < _len; x++) {
-        row = _ref[x];
-        cells = "";
-        _ref2 = this.board[x];
-        for (y = 0, _len2 = _ref2.length; y < _len2; y++) {
-          cell = _ref2[y];
-          cells += "<td class='" + (this.show_cell(x, y)) + "'>&nbsp;</td>";
+      var cell, cells, row, rows;
+      rows = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.board;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          row = _ref[_i];
+          cells = (function() {
+            var _j, _len2, _results2;
+            _results2 = [];
+            for (_j = 0, _len2 = row.length; _j < _len2; _j++) {
+              cell = row[_j];
+              _results2.push("<td class='" + (this.cell_css(cell)) + "'>&nbsp;</td>");
+            }
+            return _results2;
+          }).call(this);
+          _results.push("<tr>" + cells + "</tr>");
         }
-        rows += "<tr>" + cells + "</tr>";
-      }
+        return _results;
+      }).call(this);
       return "<table>" + rows + "</table>";
     };
     Game.prototype.live_message = function(x, y) {
@@ -115,18 +123,22 @@
       return this.board[x][y];
     };
     Game.prototype.new_board = function() {
-      var cell, new_board, row, x, y, _len, _len2, _ref;
-      new_board = new Array(this.x);
-      for (x = 0, _len = new_board.length; x < _len; x++) {
-        row = new_board[x];
-        new_board[x] = new Array(this.y);
-        _ref = new_board[x];
-        for (y = 0, _len2 = _ref.length; y < _len2; y++) {
-          cell = _ref[y];
-          new_board[x][y] = this.should_live(x, y);
+      var x, y;
+      return this.board = (function() {
+        var _results;
+        _results = [];
+        for (x = 0; 0 <= WIDTH ? x < WIDTH : x > WIDTH; 0 <= WIDTH ? x++ : x--) {
+          _results.push((function() {
+            var _results2;
+            _results2 = [];
+            for (y = 0; 0 <= HEIGHT ? y < HEIGHT : y > HEIGHT; 0 <= HEIGHT ? y++ : y--) {
+              _results2.push(this.should_live(x, y));
+            }
+            return _results2;
+          }).call(this));
         }
-      }
-      return this.board = new_board;
+        return _results;
+      }).call(this);
     };
     Game.prototype.show_cell = function(x, y) {
       if (this.board[x][y]) {
@@ -134,7 +146,14 @@
       }
       return "dead";
     };
+    Game.prototype.cell_css = function(val) {
+      if (val) {
+        return "active";
+      }
+      return "dead";
+    };
     Game.prototype.show = function() {
+      console.log(this.print_table());
       $("#output").html(this.print_table());
       return this.new_board();
     };
@@ -147,6 +166,6 @@
     game.show();
     return setInterval((function() {
       return game.show();
-    }), 100);
+    }), 1000);
   });
 }).call(this);
