@@ -3,30 +3,24 @@ class Game
   GLIDER = [ [0, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
   BLOCK = [ [0, 0], [0, 1], [1, 0], [1, 1]]
   
-  WIDTH = 50
-  HEIGHT = 60
+  WIDTH = 60
+  HEIGHT = 70
   
   constructor: ->
     @init_board()
+    @random_board()
   
-  random_cell: ->
-    (Math.floor(Math.random() * 2) == 1)
-
+  init_board: -> @board = (false for y in [0...HEIGHT] for x in [0...WIDTH])
+  
   random_board: ->
-    @board =  for x in [0...WIDTH]
-      for y in [0...HEIGHT]
-        @random_cell()
+    @board = (@random_cell() for y in [0...HEIGHT] for x in [0...WIDTH])
+  
+  random_cell: -> (Math.floor(Math.random() * 2) == 1)
   
   predefined: ->
     for coords in GLIDER
       @board[coords[0] + 10][coords[1] + 10] = true
 
-  init_board: ->
-    @board = for x in [0...WIDTH]
-      for y in [0...HEIGHT]
-        false
-    @random_board()
-    
   neighbour_count: (x, y) ->
     result = 0
     for i in SURROUND
@@ -38,34 +32,22 @@ class Game
             result += 1 
     result
 
-  print_table: ->
-    rows = for row in @board
-      cells = for cell in row
-        "<td class='#{@cell_css(cell)}'>&nbsp;</td>"
-      "<tr>#{cells.join("")}</tr>"
-    "<table>#{rows.join("")}</table>"
+  format_cells: (row) -> ("<td class='#{@cell_css(cell)}'>&nbsp;</td>" for cell in row).join("")
+  format_rows: () -> ("<tr>#{@format_cells(row)}</tr>" for row in @board).join("")
+  format_table: -> "<table>#{@format_rows()}</table>"
 
   live_message: (x, y) ->
     return "L" if @should_live(x, y)
     "&nbsp;"
 
-  toggle: (x, y) ->
-    new_val = !@board[x][y]
-
   should_live: (x, y) ->
     neighbours = @neighbour_count(x, y)
     alive = @board[x][y]
-    underpopulated = alive and neighbours < 2
-    overpopulated  = alive and neighbours > 3
-    reproducing    = !alive and neighbours == 3
-    return !@board[x][y] if underpopulated || overpopulated || reproducing
-    @board[x][y]
+    return !alive if (alive and (neighbours < 2 or neighbours > 3)) or (!alive and neighbours == 3)
+    alive
   
-  new_board: ->
-    @board = for x in [0...WIDTH]
-      for y in [0...HEIGHT]
-        @should_live(x, y)
-  
+  new_board: -> (@should_live(x, y) for y in [0...HEIGHT] for x in [0...WIDTH])
+      
   show_cell: (x, y) ->
     return "active" if @board[x][y]
     "dead"
@@ -74,15 +56,12 @@ class Game
     return "active" if val
     "dead"
 
-  show: ->
-    console.log @print_table()
-    $("#output").html(@print_table())
-    @new_board()
-    
+  update: ->
+    $("#output").html(@format_table())
+    @board = @new_board()
     
 $(document).ready ->
   game = new Game
-  game.init_board()
-  game.show()
-  setInterval((-> game.show()), 300)
+  game.update()
+  setInterval((-> game.update()), 200)
 
