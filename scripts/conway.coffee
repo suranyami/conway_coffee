@@ -12,8 +12,7 @@ class Game
   
   init_board: -> @board = (false for y in [0...HEIGHT] for x in [0...WIDTH])
   
-  random_board: ->
-    @board = (@random_cell() for y in [0...HEIGHT] for x in [0...WIDTH])
+  random_board: -> @board = (@random_cell() for y in [0...HEIGHT] for x in [0...WIDTH])
   
   random_cell: -> (Math.floor(Math.random() * 2) == 1)
   
