@@ -42,8 +42,8 @@ class Game
     rows = for row in @board
       cells = for cell in row
         "<td class='#{@cell_css(cell)}'>&nbsp;</td>"
-      "<tr>#{cells}</tr>"
-    "<table>#{rows}</table>"
+      "<tr>#{cells.join("")}</tr>"
+    "<table>#{rows.join("")}</table>"
 
   live_message: (x, y) ->
     return "L" if @should_live(x, y)
@@ -84,5 +84,5 @@ $(document).ready ->
   game = new Game
   game.init_board()
   game.show()
-  setInterval((-> game.show()), 1000)
+  setInterval((-> game.show()), 300)
 

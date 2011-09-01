@@ -94,11 +94,11 @@
             }
             return _results2;
           }).call(this);
-          _results.push("<tr>" + cells + "</tr>");
+          _results.push("<tr>" + (cells.join("")) + "</tr>");
         }
         return _results;
       }).call(this);
-      return "<table>" + rows + "</table>";
+      return "<table>" + (rows.join("")) + "</table>";
     };
     Game.prototype.live_message = function(x, y) {
       if (this.should_live(x, y)) {
@@ -166,6 +166,6 @@
     game.show();
     return setInterval((function() {
       return game.show();
-    }), 1000);
+    }), 300);
   });
 }).call(this);
