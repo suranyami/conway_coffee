@@ -10,8 +10,7 @@ class Game
     @init_board()
     @random_board()
   
-  init_board: -> @board = (false for y in [0...HEIGHT] for x in [0...WIDTH])
-  
+   
   random_board: -> @board = (@random_cell() for y in [0...HEIGHT] for x in [0...WIDTH])
   
   random_cell: -> (Math.floor(Math.random() * 2) == 1)
@@ -26,9 +25,11 @@ class Game
       cur_x = x + i
       for j in SURROUND
         cur_y = y + j
-        unless (i == 0 and j == 0) or (cur_y >= HEIGHT) or (cur_y < 0) or (cur_x >= WIDTH) or (cur_x < 0)
-          if @board[cur_x][cur_y]
-            result += 1 
+        unless (i == 0 and j == 0) or
+          (cur_y >= HEIGHT) or (cur_y < 0) or
+          (cur_x >= WIDTH) or (cur_x < 0)
+            if @board[cur_x][cur_y]
+              result += 1 
     result
 
   format_cells: (row) -> ("<td class='#{@cell_css(cell)}'>&nbsp;</td>" for cell in row).join("")
@@ -42,7 +43,8 @@ class Game
   should_live: (x, y) ->
     neighbours = @neighbour_count(x, y)
     alive = @board[x][y]
-    return !alive if (alive and (neighbours < 2 or neighbours > 3)) or (!alive and neighbours == 3)
+    return !alive if (alive and (neighbours < 2 or neighbours > 3)) or
+      (!alive and neighbours == 3)
     alive
   
   new_board: -> (@should_live(x, y) for y in [0...HEIGHT] for x in [0...WIDTH])
